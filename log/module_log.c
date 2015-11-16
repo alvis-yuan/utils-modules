@@ -17,8 +17,19 @@ static void module_log_write(module_log_t *log, char *errstr, size_t len);
 
 static int fill_time(char *buf)
 {
+    time_t now;
+    struct tm *tm;
 
-    return 0;
+    time(&now);
+    tm = localtime(&now);
+    tm->tm_year += 1900;
+    tm->tm_mon += 1;
+    
+    return snprintf(buf, sizeof("1970-01-01 00:00:00"),
+            "%4d/%02d/%02d %02d:%02d:%02d",
+            tm->tm_year, tm->tm_mon,
+            tm->tm_mday, tm->tm_hour,
+            tm->tm_min, tm->tm_sec);
 }
 
 

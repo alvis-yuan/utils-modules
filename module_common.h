@@ -3,12 +3,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
 #include "pool/module_pool.h"
+#include "log/module_log.h"
 #include "datastruct/module_array.h"
 #include "datastruct/module_string.h"
 #include "datastruct/module_list.h"
