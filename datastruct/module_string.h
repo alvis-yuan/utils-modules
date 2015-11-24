@@ -1,8 +1,7 @@
 #ifndef _MODULE_STRING_H_
 #define _MODULE_STRING_H_
 
-#include "../module_common.h"
-
+#include "../module_common.h" 
 
 typedef struct {
     size_t    len;

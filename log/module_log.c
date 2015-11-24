@@ -1,4 +1,5 @@
 #include "module_log.h"
+#include "../module_common.h"
 
 static const char *err_levels[] = {
     "stderr", "emerg", "alert", "crit", "error",
@@ -79,7 +80,7 @@ module_open_file_t *module_conf_open_file(module_cycle_t *cycle, module_str_t *n
         file->name = full;
 
     } else {
-        file->fd = module_stderr_fileno;
+        file->fd = STDERR_FILENO;
         file->name.len = 0;
         file->name.data = NULL;
     }
@@ -228,12 +229,12 @@ int module_set_error_log_levels(module_conf_t *cf, module_log_t *log)
     for (i = 2; i < cf->args->nelts; i++) {
 
         for (n = 1; n <= MODULE_LOG_DEBUG; n++) {
-            if (module_strcmp(value[i].data, err_levels[n]) == 0) {
+            if (strcmp(value[i].data, err_levels[n]) == 0) {
 
                 if (log->log_level != 0) {
-                    module_conf_log_error(MODULE_LOG_EMERG, cf, 0,
-                            "invalid log level \"%s\"",
-                            value[i].data);
+                    //module_conf_log_error(MODULE_LOG_EMERG, cf, 0,
+                     //       "invalid log level \"%s\"",
+                      //      value[i].data);
                     return MODULE_ERROR;
                 }
 
@@ -243,11 +244,11 @@ int module_set_error_log_levels(module_conf_t *cf, module_log_t *log)
         }
 
         for (n = 0, d = MODULE_LOG_DEBUG_FIRST; d <= MODULE_LOG_DEBUG_LAST; d <<= 1) {
-            if (module_strcmp(value[i].data, debug_levels[n++]) == 0) {
+            if (strcmp(value[i].data, debug_levels[n++]) == 0) {
                 if (log->log_level & ~MODULE_LOG_DEBUG_ALL) {
-                    module_conf_log_error(MODULE_LOG_EMERG, cf, 0,
-                            "invalid log level \"%s\"",
-                            value[i].data);
+                //    module_conf_log_error(MODULE_LOG_EMERG, cf, 0,
+                 //           "invalid log level \"%s\"",
+                  //          value[i].data);
                     return MODULE_ERROR;
                 }
 
@@ -257,8 +258,8 @@ int module_set_error_log_levels(module_conf_t *cf, module_log_t *log)
 
 
         if (log->log_level == 0) {
-            module_conf_log_error(MODULE_LOG_EMERG, cf, 0,
-                    "invalid log level \"%s\"", value[i].data);
+            //module_conf_log_error(MODULE_LOG_EMERG, cf, 0,
+                    //"invalid log level \"%s\"", value[i].data);
             return MODULE_ERROR;
         }
     }

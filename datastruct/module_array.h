@@ -1,7 +1,7 @@
 #ifndef _MODULE_ARRAY_H_
 #define _MODULE_ARRAY_H_
 
-#include "../module_common.h"
+#include "../module_common.c"
 
 
 typedef struct module_array_s {

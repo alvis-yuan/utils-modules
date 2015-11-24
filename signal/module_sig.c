@@ -1,7 +1,5 @@
-#include "module_sig.h"
+#include "../module_common.h"
 #include "../log/module_log.h"
-
-extern module_log_t *test_log;
 
 static void handler_callback(int sig)
 {

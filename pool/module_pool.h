@@ -1,8 +1,7 @@
 #ifndef _MODULE_POOL_H_
 #define _MODULE_POOL_H_
 
-#include "../module_common.h"
-
+#include "../module_include.h"
 
 #define MODULE_MAX_ALLOC_FROM_POOL 4095
 #define MODULE_ALIGN       (sizeof(unsigned long) - 1)  /* platform word */

@@ -1,13 +1,7 @@
 #ifndef _SIG_MODULE_H_
 #define _SIG_MODULE_H_
 
-#include <signal.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
 #include <pthread.h>
-#include <sys/syscall.h>
 
 typedef void (*handler_sig)(int sig);
 

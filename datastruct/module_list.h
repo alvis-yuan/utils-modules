@@ -1,7 +1,7 @@
 #ifndef _MODULE_LIST_H_
 #define _MODULE_LIST_H_
 
-#include "../module_common.h"
+#include "../module_include.h"
 
 typedef struct module_list_part_s  module_list_part_t;
 
