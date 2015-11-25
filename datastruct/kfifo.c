@@ -1,29 +1,46 @@
-/*
- * A simple kernel FIFO implementation.
- *
- * Copyright (C) 2004 Stelian Pop <stelian@popies.net>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- */
+#include "kfifo.h"
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include <linux/kernel.h>
-#include <linux/module.h>
-#include <linux/slab.h>
-#include <linux/err.h>
-#include <linux/kfifo.h>
+
+#define min(x, y) ((x) < (y) ? (x) : (y))
+
+static __inline__ int generic_fls(int x)
+{
+    int r = 32;
+
+    if (!x)
+        return 0;
+    if (!(x & 0xffff0000u)) {
+        x <<= 16;
+        r -= 16;
+    }
+    if (!(x & 0xff000000u)) {
+        x <<= 8;
+        r -= 8;
+    }
+    if (!(x & 0xf0000000u)) {
+        x <<= 4;
+        r -= 4;
+    }
+    if (!(x & 0xc0000000u)) {
+        x <<= 2;
+        r -= 2;
+    }
+    if (!(x & 0x80000000u)) {
+        x <<= 1;
+        r -= 1;
+    }
+    return r;
+}
+
+
+static inline unsigned long __attribute_const__ roundup_pow_of_two(unsigned long x)
+{
+        return (1UL << generic_fls(x - 1));
+}
+
 
 /**
  * kfifo_init - allocates a new FIFO using a preallocated buffer
@@ -35,17 +52,16 @@
  * Do NOT pass the kfifo to kfifo_free() after use ! Simply free the
  * struct kfifo with kfree().
  */
-struct kfifo *kfifo_init(unsigned char *buffer, unsigned int size,
-			 unsigned int __nocast gfp_mask, spinlock_t *lock)
+struct kfifo *kfifo_init(unsigned char *buffer, unsigned int size, pthread_mutex_t *lock)
 {
 	struct kfifo *fifo;
 
 	/* size must be a power of 2 */
-	BUG_ON(size & (size - 1));
+	assert(size & (size - 1));
 
-	fifo = kmalloc(sizeof(struct kfifo), gfp_mask);
+	fifo = malloc(sizeof(struct kfifo));
 	if (!fifo)
-		return ERR_PTR(-ENOMEM);
+		return NULL;
 
 	fifo->buffer = buffer;
 	fifo->size = size;
@@ -54,7 +70,6 @@ struct kfifo *kfifo_init(unsigned char *buffer, unsigned int size,
 
 	return fifo;
 }
-EXPORT_SYMBOL(kfifo_init);
 
 /**
  * kfifo_alloc - allocates a new FIFO and its internal buffer
@@ -64,7 +79,7 @@ EXPORT_SYMBOL(kfifo_init);
  *
  * The size will be rounded-up to a power of 2.
  */
-struct kfifo *kfifo_alloc(unsigned int size, unsigned int __nocast gfp_mask, spinlock_t *lock)
+struct kfifo *kfifo_alloc(unsigned int size, pthread_mutex_t *lock)
 {
 	unsigned char *buffer;
 	struct kfifo *ret;
@@ -74,22 +89,21 @@ struct kfifo *kfifo_alloc(unsigned int size, unsigned int __nocast gfp_mask, spi
 	 * wrap' tachnique works only in this case.
 	 */
 	if (size & (size - 1)) {
-		BUG_ON(size > 0x80000000);
+		assert(size > 0x80000000);
 		size = roundup_pow_of_two(size);
 	}
 
-	buffer = kmalloc(size, gfp_mask);
+	buffer = malloc(size);
 	if (!buffer)
-		return ERR_PTR(-ENOMEM);
+		return NULL;
 
-	ret = kfifo_init(buffer, size, gfp_mask, lock);
+	ret = kfifo_init(buffer, size, lock);
 
-	if (IS_ERR(ret))
-		kfree(buffer);
+	if (!ret)
+		free(buffer);
 
 	return ret;
 }
-EXPORT_SYMBOL(kfifo_alloc);
 
 /**
  * kfifo_free - frees the FIFO
@@ -97,10 +111,9 @@ EXPORT_SYMBOL(kfifo_alloc);
  */
 void kfifo_free(struct kfifo *fifo)
 {
-	kfree(fifo->buffer);
-	kfree(fifo);
+	free(fifo->buffer);
+	free(fifo);
 }
-EXPORT_SYMBOL(kfifo_free);
 
 /**
  * __kfifo_put - puts some data into the FIFO, no locking version
@@ -133,7 +146,6 @@ unsigned int __kfifo_put(struct kfifo *fifo,
 
 	return len;
 }
-EXPORT_SYMBOL(__kfifo_put);
 
 /**
  * __kfifo_get - gets some data from the FIFO, no locking version
@@ -165,4 +177,3 @@ unsigned int __kfifo_get(struct kfifo *fifo,
 
 	return len;
 }
-EXPORT_SYMBOL(__kfifo_get);

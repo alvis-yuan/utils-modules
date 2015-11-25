@@ -1,43 +1,18 @@
-/*
- * A simple kernel FIFO implementation.
- *
- * Copyright (C) 2004 Stelian Pop <stelian@popies.net>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- */
 #ifndef _LINUX_KFIFO_H
 #define _LINUX_KFIFO_H
 
-#ifdef __KERNEL__
-
-#include <linux/kernel.h>
-#include <linux/spinlock.h>
+#include <pthread.h>
 
 struct kfifo {
 	unsigned char *buffer;	/* the buffer holding the data */
 	unsigned int size;	/* the size of the allocated buffer */
 	unsigned int in;	/* data is added at offset (in % size) */
 	unsigned int out;	/* data is extracted from off. (out % size) */
-	spinlock_t *lock;	/* protects concurrent modifications */
+	pthread_mutex_t *lock;	/* protects concurrent modifications */
 };
 
-extern struct kfifo *kfifo_init(unsigned char *buffer, unsigned int size,
-				unsigned int __nocast gfp_mask, spinlock_t *lock);
-extern struct kfifo *kfifo_alloc(unsigned int size, unsigned int __nocast gfp_mask,
-				 spinlock_t *lock);
+extern struct kfifo *kfifo_init(unsigned char *buffer, unsigned int size, pthread_mutex_t *lock);
+extern struct kfifo *kfifo_alloc(unsigned int size, pthread_mutex_t *lock);
 extern void kfifo_free(struct kfifo *fifo);
 extern unsigned int __kfifo_put(struct kfifo *fifo,
 				unsigned char *buffer, unsigned int len);
@@ -59,13 +34,11 @@ static inline void __kfifo_reset(struct kfifo *fifo)
  */
 static inline void kfifo_reset(struct kfifo *fifo)
 {
-	unsigned long flags;
-
-	spin_lock_irqsave(fifo->lock, flags);
+	pthread_mutex_lock(fifo->lock);
 
 	__kfifo_reset(fifo);
 
-	spin_unlock_irqrestore(fifo->lock, flags);
+	pthread_mutex_unlock(fifo->lock);
 }
 
 /**
@@ -81,14 +54,13 @@ static inline void kfifo_reset(struct kfifo *fifo)
 static inline unsigned int kfifo_put(struct kfifo *fifo,
 				     unsigned char *buffer, unsigned int len)
 {
-	unsigned long flags;
 	unsigned int ret;
 
-	spin_lock_irqsave(fifo->lock, flags);
+	pthread_mutex_lock(fifo->lock);
 
 	ret = __kfifo_put(fifo, buffer, len);
 
-	spin_unlock_irqrestore(fifo->lock, flags);
+	pthread_mutex_unlock(fifo->lock);
 
 	return ret;
 }
@@ -105,10 +77,9 @@ static inline unsigned int kfifo_put(struct kfifo *fifo,
 static inline unsigned int kfifo_get(struct kfifo *fifo,
 				     unsigned char *buffer, unsigned int len)
 {
-	unsigned long flags;
 	unsigned int ret;
 
-	spin_lock_irqsave(fifo->lock, flags);
+	pthread_mutex_lock(fifo->lock);
 
 	ret = __kfifo_get(fifo, buffer, len);
 
@@ -119,7 +90,7 @@ static inline unsigned int kfifo_get(struct kfifo *fifo,
 	if (fifo->in == fifo->out)
 		fifo->in = fifo->out = 0;
 
-	spin_unlock_irqrestore(fifo->lock, flags);
+	pthread_mutex_unlock(fifo->lock);
 
 	return ret;
 }
@@ -139,19 +110,15 @@ static inline unsigned int __kfifo_len(struct kfifo *fifo)
  */
 static inline unsigned int kfifo_len(struct kfifo *fifo)
 {
-	unsigned long flags;
 	unsigned int ret;
 
-	spin_lock_irqsave(fifo->lock, flags);
+	pthread_mutex_lock(fifo->lock);
 
 	ret = __kfifo_len(fifo);
 
-	spin_unlock_irqrestore(fifo->lock, flags);
+	pthread_mutex_unlock(fifo->lock);
 
 	return ret;
 }
 
-#else
-#warning "don't include kernel headers in userspace"
-#endif /* __KERNEL__ */
 #endif
