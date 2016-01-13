@@ -1,9 +1,8 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
-#if defined(__KERNEL__) || defined(_LVM_H_INCLUDE)
 
-#include <linux/prefetch.h>
+typedef struct list_head list_node;
 
 /*
  * Simple doubly linked list implementation.
@@ -193,16 +192,16 @@ static inline void list_splice_init(struct list_head *list,
  * @head:	the head for your list.
  */
 #define list_for_each(pos, head) \
-	for (pos = (head)->next, prefetch(pos->next); pos != (head); \
-        	pos = pos->next, prefetch(pos->next))
+	for (pos = (head)->next; pos != (head); \
+        	pos = pos->next)
 /**
  * list_for_each_prev	-	iterate over a list backwards
  * @pos:	the &struct list_head to use as a loop counter.
  * @head:	the head for your list.
  */
 #define list_for_each_prev(pos, head) \
-	for (pos = (head)->prev, prefetch(pos->prev); pos != (head); \
-        	pos = pos->prev, prefetch(pos->prev))
+	for (pos = (head)->prev; pos != (head); \
+        	pos = pos->prev)
         	
 /**
  * list_for_each_safe	-	iterate over a list safe against removal of list entry
@@ -221,12 +220,9 @@ static inline void list_splice_init(struct list_head *list,
  * @member:	the name of the list_struct within the struct.
  */
 #define list_for_each_entry(pos, head, member)				\
-	for (pos = list_entry((head)->next, typeof(*pos), member),	\
-		     prefetch(pos->member.next);			\
+	for (pos = list_entry((head)->next, typeof(*pos), member);	\
 	     &pos->member != (head); 					\
-	     pos = list_entry(pos->member.next, typeof(*pos), member),	\
-		     prefetch(pos->member.next))
+	     pos = list_entry(pos->member.next, typeof(*pos), member))
 
-#endif /* __KERNEL__ || _LVM_H_INCLUDE */
 
 #endif
