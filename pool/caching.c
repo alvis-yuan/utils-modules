@@ -1,10 +1,4 @@
-#include <unistd.h>
-#include <stdio.h>
 #include "pool.h"
-#include <strings.h>
-#include <string.h>
-#include <pthread.h>
-#include <assert.h>
 
 
 extern mdl_pool_factory_policy_t mdl_pool_factory_default_policy;

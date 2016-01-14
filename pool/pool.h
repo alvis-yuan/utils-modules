@@ -1,12 +1,9 @@
 #ifndef _POOL_INTERNAL_H
 #define _POOL_INTERNAL_H
 
-#include <unistd.h>
-#include <stdio.h>
-#include <pthread.h>
-#include <strings.h>
 #include "../datastruct/list.h"
 #include "../log/log.h"
+#include "../module_common.h"
 
 #define UNUSED_ARG(arg)    (void)arg
 #define POOL_ALIGNMENT      4
@@ -135,8 +132,10 @@ void *mdl_pool_alloc_from_block(mdl_pool_block_t *block, size_t size);
 
 void *mdl_pool_alloc(mdl_pool_t *pool, size_t size);
 
-
 void *mdl_pool_calloc(mdl_pool_t *pool, size_t count, size_t size);
+
+
+void *mdl_pool_zalloc(mdl_pool_t *pool, size_t size);
 
 const char *mdl_pool_getobjname(const mdl_pool_t *pool);
 

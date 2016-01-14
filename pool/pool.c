@@ -1,8 +1,5 @@
 #include "pool.h"
 #include "../datastruct/list.h"
-#include <assert.h>
-#include <string.h>
-#include <strings.h>
 
 #define ALIGN_PTR(PTR,ALIGNMENT)    (PTR + (-(ssize_t)(PTR) & (ALIGNMENT - 1)))
 #define MAX_OBJ_NAME    32
@@ -212,8 +209,7 @@ void mdl_pool_reset(mdl_pool_t *pool)
 void mdl_pool_destroy_int(mdl_pool_t *pool)
 {
     size_t initial_size;
-    mdl_pool_block_t *block = list_entry(&pool->block_head_list.next, 
-            mdl_pool_block_t, block_node_list);
+    mdl_pool_block_t *block = (mdl_pool_block_t *)pool->block_head_list.next;
 
     reset_pool(pool);
 
@@ -265,8 +261,8 @@ void *mdl_pool_alloc_from_block(mdl_pool_block_t *block, size_t size)
 
 void *mdl_pool_alloc(mdl_pool_t *pool, size_t size)
 {
-    mdl_pool_block_t *block = list_entry(&pool->block_head_list.next, 
-            mdl_pool_block_t, block_node_list);
+    //mdl_pool_block_t *block = (mdl_pool_block_t *)pool->block_head_list.next;
+    mdl_pool_block_t *block = list_entry(pool->block_head_list.next, mdl_pool_block_t, block_node_list);
 
     void *ptr = mdl_pool_alloc_from_block(block, size);
     if (!ptr)
@@ -276,6 +272,12 @@ void *mdl_pool_alloc(mdl_pool_t *pool, size_t size)
 
     return ptr;
 }
+
+void *mdl_pool_zalloc(mdl_pool_t *pool, size_t size)
+{
+        return mdl_pool_calloc(pool, 1, size);
+}
+
 
 
 void *mdl_pool_calloc(mdl_pool_t *pool, size_t count, size_t size)

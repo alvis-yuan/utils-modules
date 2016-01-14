@@ -1,14 +1,13 @@
-objects = log.o
+objects = thread.o
 
 objpath = ../object
 
-CCFLAGS = -g 
-
-log: log.c
-	gcc -c $<
+thread: thread.c
+	gcc -g -c $<
 	cp $(objects) $(objpath)
 
 
 clean:
 	rm -rf $(objects)
 	rm -rf $(objpath)/$(objects)
+

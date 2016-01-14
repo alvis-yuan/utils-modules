@@ -38,7 +38,7 @@ enum log_level
     MDL_LOG_TRACE = 5,
     MDL_LOG_DETAIL = 6
 };
-#define MDL_LOG_MAX_LEVEL MDL_LOG_DEBUG
+#define MDL_LOG_MAX_LEVEL MDL_LOG_DETAIL
 void mdl_log_set_level(int level);
 int mdl_log_get_level(void);
 

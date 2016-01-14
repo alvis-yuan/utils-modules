@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <semaphore.h>
+#include <stdarg.h>
+#include <assert.h>
 
 typedef unsigned long       ulong;
 typedef unsigned int        uint;
@@ -45,6 +47,7 @@ typedef long tid_t;
 #define ARRAY_SIZE(a)    (sizeof(a)/sizeof(a[0]))
 
 
+#define UNUSED_ARG(arg) (void)arg
 
 
 
@@ -69,6 +72,27 @@ typedef long tid_t;
     }\
 }while(0)
 
+#define CHECK_RETURN(condition, success, fail) \
+    do\
+{\
+    if ((condition))\
+    {\
+        return success;\
+    }\
+    else\
+    {\
+        return fail;\
+    }\
+}while(0)
+
+#define ENSURE_RETURN(condition, ret) \
+    do \
+{ \
+    if (!(condition)) \
+    { \
+        return (ret); \
+    } \
+}while(0)
 
 
 /* redefine library routines */
@@ -118,6 +142,9 @@ typedef long tid_t;
         (t1).tv_sec -= (t2).tv_sec;       \
         (t1).tv_usec -= (t2).tv_usec;     \
     } while (0)
+/* end of time operations */
+
+
 
 
 

@@ -1,7 +1,5 @@
 #include "pool.h"
 #include "sigature.h"
-#include <errno.h>
-#include <stdlib.h>
 
 static void *default_block_alloc(mdl_pool_factory_t *factory, size_t size)
 {

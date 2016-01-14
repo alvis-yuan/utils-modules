@@ -1,29 +1,16 @@
 #include "log.h"
-#include <stdarg.h>
-#include <time.h>
-#include <sys/time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/syscall.h>
-#include "../thread/tls.c"
+#include "../module_common.h"
+#include "../thread/thread.h"
 
-#if HAS_THREADS
 static long thread_suspended_tls_id = -1;
-#if MDL_LOG_ENABLE_INDENT
 static long thread_indent_tls_id = -1;
-#endif
-#endif
-#if !HAS_THREADS || !MDL_LOG_ENABLE_INDENT
-static int log_indent;
-#endif
+
 
 int log_max_level = MDL_LOG_MAX_LEVEL;
 
 static unsigned log_decor = LOG_HAS_TIME | LOG_HAS_MICRO_SEC |
 LOG_HAS_NEWLINE |
-LOG_HAS_SPACE | LOG_HAS_COLOR |     
+LOG_HAS_SPACE | LOG_HAS_THREAD_ID |  
 LOG_HAS_INDENT | LOG_HAS_PROCESS_ID;
 
 void log_write(int level, const char *buffer, int len);
@@ -141,7 +128,6 @@ unsigned mdl_log_get_decor(void)
 
 /*******************************************************************************/
 /* indent operations */
-#if MDL_LOG_ENABLE_INDENT && HAS_THREADS
 static void log_set_indent(int indent)
 {
         if (indent < 0)
@@ -156,22 +142,6 @@ static int log_get_raw_indent(void)
         return (long)(ssize_t)mdl_thread_local_get(thread_indent_tls_id);
 }
 
-#else
-static void log_set_indent(int indent)
-{
-    log_indent = indent;
-    if (log_indent < 0)
-    {
-        log_indent = 0;
-    }
-}
-
-
-static int log_get_raw_indent(void)
-{
-    return log_indent;
-}
-#endif
 
 static int log_get_indent(void)
 {
@@ -577,14 +547,14 @@ void log_core(int level, const char *format, ...)
     /* pid */
     if (log_decor & LOG_HAS_THREAD_ID) 
     {
-        len += snprintf(log_buffer + len, max - len, " [%8d]", getpid());
+        len += snprintf(log_buffer + len, max - len, " [%8ld]", syscall(SYS_gettid));
     }
 
     /* thread id */
     if (log_decor & LOG_HAS_PROCESS_ID) 
     {
-        len += snprintf(log_buffer + len, max - len, "#[%8ld]",
-                syscall(SYS_gettid));
+        len += snprintf(log_buffer + len, max - len, "#[%8d]",
+                getpid());
     }
 
     if (log_decor != 0 && log_decor != LOG_HAS_NEWLINE)
