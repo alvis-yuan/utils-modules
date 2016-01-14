@@ -1,27 +1,4 @@
-/*
-  Red Black Trees
-  (C) 1999  Andrea Arcangeli <andrea@suse.de>
-  (C) 2002  David Woodhouse <dwmw2@infradead.org>
-  
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-  linux/lib/rbtree.c
-*/
-
-#include <linux/rbtree.h>
-#include <linux/module.h>
+#include "rbtree.h"
 
 static void __rb_rotate_left(struct rb_node *node, struct rb_root *root)
 {
@@ -127,7 +104,6 @@ void rb_insert_color(struct rb_node *node, struct rb_root *root)
 
 	root->rb_node->rb_color = RB_BLACK;
 }
-EXPORT_SYMBOL(rb_insert_color);
 
 static void __rb_erase_color(struct rb_node *node, struct rb_node *parent,
 			     struct rb_root *root)
@@ -294,7 +270,6 @@ void rb_erase(struct rb_node *node, struct rb_root *root)
 	if (color == RB_BLACK)
 		__rb_erase_color(child, parent, root);
 }
-EXPORT_SYMBOL(rb_erase);
 
 /*
  * This function returns the first node (in sort order) of the tree.
@@ -310,7 +285,6 @@ struct rb_node *rb_first(struct rb_root *root)
 		n = n->rb_left;
 	return n;
 }
-EXPORT_SYMBOL(rb_first);
 
 struct rb_node *rb_last(struct rb_root *root)
 {
@@ -323,7 +297,6 @@ struct rb_node *rb_last(struct rb_root *root)
 		n = n->rb_right;
 	return n;
 }
-EXPORT_SYMBOL(rb_last);
 
 struct rb_node *rb_next(struct rb_node *node)
 {
@@ -347,7 +320,6 @@ struct rb_node *rb_next(struct rb_node *node)
 
 	return node->rb_parent;
 }
-EXPORT_SYMBOL(rb_next);
 
 struct rb_node *rb_prev(struct rb_node *node)
 {
@@ -367,7 +339,6 @@ struct rb_node *rb_prev(struct rb_node *node)
 
 	return node->rb_parent;
 }
-EXPORT_SYMBOL(rb_prev);
 
 void rb_replace_node(struct rb_node *victim, struct rb_node *new,
 		     struct rb_root *root)
@@ -391,4 +362,3 @@ void rb_replace_node(struct rb_node *victim, struct rb_node *new,
 	/* Copy the pointers/colour from the victim to the replacement */
 	*new = *victim;
 }
-EXPORT_SYMBOL(rb_replace_node);
