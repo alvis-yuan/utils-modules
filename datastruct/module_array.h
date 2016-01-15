@@ -1,28 +1,36 @@
 #ifndef _MODULE_ARRAY_H_
 #define _MODULE_ARRAY_H_
 
-#include "../module_common.c"
+#include "../module_common.h"
+#include "../pool/pool.h"
 
 
-typedef struct module_array_s {
-    void        *elts;
-    u_int   nelts;
-    size_t       size;
-    u_int   nalloc;
-    module_pool_t  *pool;
-}module_array_t;
-
-
-module_array_t *module_create_array(module_pool_t *p, u_int n, size_t size);
-void module_destroy_array(module_array_t *a);
-void *module_push_array(module_array_t *a);
-
-
-inline static int module_array_init(module_array_t *array, module_pool_t *pool,
-        u_int n, size_t size)
+typedef struct mdl_array_s mdl_array_t;
+struct mdl_array_s 
 {
-    if (!(array->elts = module_palloc(pool, n * size))) {
-        return MODULE_ERROR;
+    void        *elts;
+
+    uint   nelts;
+    
+    size_t       size;
+
+    uint   nalloc;
+
+    mdl_pool_t  *pool;
+};
+
+
+mdl_array_t *mdl_create_array(mdl_pool_t *p, uint n, size_t size);
+void mdl_destroy_array(mdl_array_t *a);
+void *mdl_push_array(mdl_array_t *a);
+
+
+inline static int mdl_array_init(mdl_array_t *array, mdl_pool_t *pool,
+        uint n, size_t size)
+{
+    if (!(array->elts = mdl_pool_alloc(pool, n * size))) 
+    {
+        return FAILURE;
     }
 
     array->nelts = 0;
@@ -30,17 +38,17 @@ inline static int module_array_init(module_array_t *array, module_pool_t *pool,
     array->nalloc = n;
     array->pool = pool;
 
-    return MODULE_OK;
+    return SUCCESS;
 }
 
 
 
-#define module_init_array(a, p, n, s, rc)                                       \
-    module_test_null(a.elts, module_palloc(p, n * s), rc);                         \
+#define mdl_init_array(a, p, n, s, rc)                                       \
+    mdl_test_null(a.elts, mdl_palloc(p, n * s), rc);                         \
 a.nelts = 0; a.size = s; a.nalloc = n; a.pool = p;
 
-#define module_array_create  module_create_array
-#define module_array_push    module_push_array
+#define mdl_array_create  mdl_create_array
+#define mdl_array_push    mdl_push_array
 
 
 #endif /* _MODULE_ARRAY_H_*/

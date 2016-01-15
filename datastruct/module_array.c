@@ -1,12 +1,12 @@
 #include "module_array.h"
 
-module_array_t *module_create_array(module_pool_t *p, u_int n, size_t size)
+mdl_array_t *mdl_create_array(mdl_pool_t *p, uint n, size_t size)
 {
-    module_array_t *a;
+    mdl_array_t *a;
 
-    module_test_null(a, module_palloc(p, sizeof(module_array_t)), NULL);
+    mdl_test_null(a, mdl_palloc(p, sizeof(mdl_array_t)), NULL);
 
-    module_test_null(a->elts, module_palloc(p, n * size), NULL);
+    mdl_test_null(a->elts, mdl_palloc(p, n * size), NULL);
 
     a->pool = p;
     a->nelts = 0;
@@ -17,9 +17,9 @@ module_array_t *module_create_array(module_pool_t *p, u_int n, size_t size)
 }
 
 
-void module_destroy_array(module_array_t *a)
+void mdl_destroy_array(mdl_array_t *a)
 {
-    module_pool_t  *p;
+    mdl_pool_t  *p;
 
     p = a->pool;
 
@@ -27,16 +27,16 @@ void module_destroy_array(module_array_t *a)
         p->last -= a->size * a->nalloc;
     }
 
-    if ((char *) a + sizeof(module_array_t) == p->last) {
+    if ((char *) a + sizeof(mdl_array_t) == p->last) {
         p->last = (char *) a;
     }
 }
 
 
-void *module_push_array(module_array_t *a)
+void *mdl_push_array(mdl_array_t *a)
 {
     void        *elt, *new;
-    module_pool_t  *p;
+    mdl_pool_t  *p;
 
     /* array is full */
     if (a->nelts == a->nalloc) {
@@ -51,7 +51,7 @@ void *module_push_array(module_array_t *a)
 
             /* allocate new array */
         } else {
-            module_test_null(new, module_palloc(p, 2 * a->nalloc * a->size), NULL);
+            mdl_test_null(new, mdl_palloc(p, 2 * a->nalloc * a->size), NULL);
 
             memcpy(new, a->elts, a->nalloc * a->size);
             a->elts = new;

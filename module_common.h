@@ -15,6 +15,7 @@
 #include <semaphore.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <sys/time.h>
 
 typedef unsigned long       ulong;
 typedef unsigned int        uint;
@@ -139,6 +140,11 @@ typedef long tid_t;
 /* two struct timeval minus */
 #define TIME_VAL_SUB(t1, t2)  \
     do {                \
+        if ((t1).tv_usec < (t2).tv_usec) \
+        {\
+            (t1).tv_sec--;\
+            (t1).tv_usec += 1000000;\
+        }\
         (t1).tv_sec -= (t2).tv_sec;       \
         (t1).tv_usec -= (t2).tv_usec;     \
     } while (0)
