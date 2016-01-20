@@ -132,7 +132,6 @@ static void _merge_sort(int *a, int first, int last, int *res)
         _merge_sort(a, mid + 1, last, res);
         //merge_array(a, mid - first + 1, a + mid + 1, last - mid, res);
         mergearray(a, first, mid, last, res);
-        printf("recursion completed\n");
     }
 }
 
