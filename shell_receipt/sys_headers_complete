@@ -1,0 +1,38 @@
+ctags -R  --c-kinds=p --fields=+S \
+--exclude=/usr/include/dbus-1.0 \
+--exclude=/usr/include/drm \
+--exclude=/usr/include/mtd \
+--exclude=/usr/include/nautilus-sendto \
+--exclude=/usr/include/netash \
+--exclude=/usr/include/netatalk \
+--exclude=/usr/include/netax25 \
+--exclude=/usr/include/neteconet \
+--exclude=/usr/include/netipx \
+--exclude=/usr/include/netiucv \
+--exclude=/usr/include/netpacket \
+--exclude=/usr/include/netrom \
+--exclude=/usr/include/netrose \
+--exclude=/usr/include/nfs \
+--exclude=/usr/include/python2.7 \
+--exclude=/usr/include/rdma \
+--exclude=/usr/include/rpc \
+--exclude=/usr/include/rpcsvc \
+--exclude=/usr/include/scsi \
+--exclude=/usr/include/sound \
+--exclude=/usr/include/uapi \
+--exclude=/usr/include/video \
+--exclude=/usr/include/X11 \
+--exclude=/usr/include/xen \
+--exclude=/usr/include/c++ \
+--exclude=/usr/include/xorg \
+-I __THROW \
+-I __THROWNL \
+-I __attribute_pure__ \
+-I __nonnull \
+-I __attribute__ \
+-I __wur \
+-I "__THROW __wur" \
+-I "__THROW __attribute_malloc__ __wur" \
+-I "__THROW __attribute_warn_unused_result__" \
+-f ~/.tags/syscomplete.tags \
+/usr/include

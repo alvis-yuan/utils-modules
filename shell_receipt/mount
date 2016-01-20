@@ -1,0 +1,1 @@
+mount -t cifs -o username=admin,password=YJh#891107 //192.168.30.2/f$ /root/test

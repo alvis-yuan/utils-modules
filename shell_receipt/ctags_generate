@@ -1,0 +1,7 @@
+ctags -R --extra=+f --c-kinds=+px --fields=+ztKS `pwd`
+mv tags ~/.tags/prjtags
+find `pwd` -name *.[ch] > cscope.data
+cscope -bkq -i cscope.data
+rm  -rf cscope.data
+mv -f cscope.out cscope.in.out cscope.po.out  ~/.tags/
+
